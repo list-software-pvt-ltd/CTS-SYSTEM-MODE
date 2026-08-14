@@ -50,13 +50,13 @@
 			}
 			if(whattodo.equalsIgnoreCase("FF"))
 			{
-				query="select distinct nvl(RTO_XMLFILENAME, 'NOT RETURNED YET') from RETRUNOUTWARD where RTO_CLEARINGTYPE='"+cltype+"' and RTO_DDMMYYYY='"+frdate+"'";
+				query="select distinct nvl(RTO_XMLFILENAME, 'NOT RETURNED YET') from RETRUNOUTWARD where  RTO_DDMMYYYY='"+frdate+"'";//RTO_CLEARINGTYPE='"+cltype+"' and
 				System.out.println(query);
 				PreparedStatement ps=cn.prepareStatement(query);
 				//ps.setString(1,frdate);
 				//ps.setString(2,cltype);
 				
-				System.out.println("############# cltype"+cltype+"---");
+				System.out.println("############# cltype="+cltype+"---");
 				System.out.println("############# frdate"+frdate+"---");
 				System.out.println("############# query"+query+"---");
 				System.out.println("############# query"+query+"---");
@@ -87,9 +87,9 @@
 			else if(whattodo.equalsIgnoreCase("S"))
 			{
 				if(xmlfile.equalsIgnoreCase("NOT RETURNED YET"))
-					query="select * from RETRUNOUTWARD where RTO_DDMMYYYY='"+frdate+"' and  RTO_STATUS<>'D' and  RTO_CLEARINGTYPE='"+cltype+"'";
+					query="select * from RETRUNOUTWARD where RTO_DDMMYYYY='"+frdate+"' and  RTO_STATUS<>'D' ";//and  RTO_CLEARINGTYPE='"+cltype+"'
 				else
-					query="select * from RETRUNOUTWARD where RTO_DDMMYYYY='"+frdate+"' and  RTO_CLEARINGTYPE='"+cltype+"' and RTO_XMLFILENAME='"+xmlfile+"'";
+					query="select * from RETRUNOUTWARD where RTO_DDMMYYYY='"+frdate+"' and   RTO_XMLFILENAME='"+xmlfile+"'";//RTO_CLEARINGTYPE='"+cltype+"' and
 				//System.out.println(query);
 				PreparedStatement ps=cn.prepareStatement(query);
 				//ps.setString(1,frdate);
@@ -143,7 +143,7 @@
 			frdate=frdate.replace("-", "");
 			String vals=request.getParameter("VALS");
 			JSONArray array=new JSONArray(vals);			  
-			query="delete from RETRUNOUTWARD where RTO_DDMMYYYY=? and RTO_CHEQUENO=? and  RTO_SORTCODE=? and RTO_TRANSACTIONCODE=? and RTO_AMOUNT=? and RTO_STATUS<>'D' and  RTO_CLEARINGTYPE=?";
+			query="delete from RETRUNOUTWARD where RTO_DDMMYYYY=? and RTO_CHEQUENO=? and  RTO_SORTCODE=? and RTO_TRANSACTIONCODE=? and RTO_AMOUNT=? and RTO_STATUS<>'D' ";//and  RTO_CLEARINGTYPE=?
 			PreparedStatement ps1=cn.prepareStatement(query);
 			int  saveFlag=0;
 			//saveFlag=ps1.executeUpdate();
@@ -160,7 +160,7 @@
 				ps1.setString(3, sortCode);
 				ps1.setString(4,tranCode );
 				ps1.setString(5, amount);
-				ps1.setString(6,cltype );
+				//ps1.setString(6,cltype );
 					
 				saveFlag=ps1.executeUpdate();
 			  }
@@ -187,7 +187,7 @@
 			xmlfile=request.getParameter("filename");
 			String vals=request.getParameter("VALS");
 			JSONArray array=new JSONArray(vals);
-			query="update RETRUNOUTWARD set RTO_STATUS='Y',RTO_XMLFILENAME='' where RTO_DDMMYYYY=? and RTO_CHEQUENO=? and  RTO_SORTCODE=? and RTO_TRANSACTIONCODE=? and RTO_AMOUNT=? and RTO_STATUS='D' and  RTO_CLEARINGTYPE=? and RTO_XMLFILENAME=?";
+			query="update RETRUNOUTWARD set RTO_STATUS='Y',RTO_XMLFILENAME='' where RTO_DDMMYYYY=? and RTO_CHEQUENO=? and  RTO_SORTCODE=? and RTO_TRANSACTIONCODE=? and RTO_AMOUNT=? and RTO_STATUS='D' and  RTO_XMLFILENAME=?";//RTO_CLEARINGTYPE=? and
 			
 			PreparedStatement ps1=cn.prepareStatement(query);
 			int  saveFlag=0;
@@ -205,8 +205,8 @@
 				ps1.setString(3, sortCode);
 				ps1.setString(4,tranCode );
 				ps1.setString(5, amount);
-				ps1.setString(6,cltype );
-				ps1.setString(7, xmlfile);
+				//ps1.setString(6,cltype );
+				ps1.setString(6, xmlfile);
 				System.out.println(frdate);
 				System.out.println(cheqNo );
 				System.out.println( sortCode);

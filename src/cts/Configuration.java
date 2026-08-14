@@ -1419,15 +1419,16 @@ public class Configuration {// 1
 			System.out.print("clr_outwardFilePath=====" + clr_outwardFilePath);
 			cbs_clr_outwardFile = new File(clr_outwardFilePath);
 			String[] fileList = cbs_clr_outwardFile.list();
-			System.out.print("file count===" + fileList.length);
+			System.out.print("+++++++++++++file count===++++++++++++++++++" + fileList.length);
 			PreparedStatement ps_values = null;
 			String clyNo=null;
+			String clo_kiosk_flg="N";
 			ResultSet rs=null;
 			// ps =
 			// con.prepareStatement("INSERT INTO CLEARINGOUTWARD(CLO_BOFD,CLO_CHQNO,CLO_SORTCD,CLO_TRANCD,CLO_AMOUNT,CLO_PAYEE_ACCNO,CLO_PAYEE_ACCNM,CLO_DATE_DDMMYYYY,CLO_BRANCH_CD,CLO_CONVERT_FLG,CLO_CLEARINGTYPE,CLO_DRAWEE_ACCNO) values(?,?,?,?,?,?,?,?,?,?,?,?)");
 			ps = con.prepareStatement("INSERT INTO CLEARINGOUTWARD(CLO_BOFD,CLO_CHQNO,CLO_SORTCD,CLO_TRANCD,CLO_AMOUNT,CLO_PAYEE_ACCNO,"
-					+ "CLO_PAYEE_ACCNM,CLO_DATE_DDMMYYYY,CLO_BRANCH_CD,CLO_CONVERT_FLG,CLO_CLEARINGTYPE,clo_olbc,clo_drawee_accno,CLO_ITEMSEQNO,CLO_CYCLNO) "
-					+ "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");//(select BRM_BRNCD from BRANCHMSTR where BRM_MICRCD=?)
+					+ "CLO_PAYEE_ACCNM,CLO_DATE_DDMMYYYY,CLO_BRANCH_CD,CLO_CONVERT_FLG,CLO_CLEARINGTYPE,clo_olbc,clo_drawee_accno,CLO_ITEMSEQNO,CLO_CYCLNO,CLO_KIOSK_FLG) "//clo_kiosk_flg=''
+					+ "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");//(select BRM_BRNCD from BRANCHMSTR where BRM_MICRCD=?)
 			validationPs = con
 					.prepareStatement("insert into cbsFileValidation values(?,?,?,?,?,?,?)");
 			errorPs = con
@@ -1445,13 +1446,13 @@ public class Configuration {// 1
 						if (!_CBSfileName.isDirectory()) {// 3
 							System.out.print("_CBSfileName:"+ _CBSfileName.getName());
 							String nm = _CBSfileName.getName();
-							System.out.print("\n nm:"+ nm);
+							System.out.print("*****\n nm:**"+ nm);
 							//Akshata 16/07/2026 
 							if (((nm.endsWith(".txt") || nm.endsWith(".TXT"  ))&& nm.startsWith("From_CBS_Clearing_Outward"))) 
 							{// 3.1
 								
 							
-BufferedReader br = new BufferedReader(
+								BufferedReader br = new BufferedReader(
 										new FileReader(clr_outwardFilePath + nm));
 								
 								
@@ -1461,7 +1462,7 @@ BufferedReader br = new BufferedReader(
 								while ((readLine = br.readLine()) != null && (readLine.trim().length()!=0)) {// 4
 									recordCounter++;
 									//System.out.println("\n readline="+readLine.trim().length());
-									System.out.print("\n before readLine="+readLine);
+									System.out.print("\n ******* before readLine="+readLine);
 									System.out.print("\n @@@@ENCRY_DECRYPT_FLG="+ENCRY_DECRYPT_FLG);
 									if(ENCRY_DECRYPT_FLG.equalsIgnoreCase("Y"))
 									{
@@ -1473,18 +1474,27 @@ BufferedReader br = new BufferedReader(
 											readLine = rs.getString(1);
 											System.out.print("\n after rs.getString(1)="+rs.getString(1));
 										}
-										System.out.print("\n after readLine="+readLine);
+										System.out.print("\n sam after readLine="+readLine);
+										System.out.println("\n UP Record Length = " +readLine.length());
+										/*
+										 * System.out.println("Decrypted Record = [" + readLine + "]");
+										 * 
+										 * System.out.println("Last 10 Characters = " + readLine.substring(Math.max(0,
+										 * readLine.length() - 10)));
+										 *///										for (int i = Math.max(0, readLine.length() - 10); i < readLine.length(); i++) {
+//										    System.out.println("Index " + i + " = '" + readLine.charAt(i) + "'");
+//										}
 									}
 									String CLO_BOFD = readLine.substring(0, 9);
 									// int bodf=Integer.parseInt(CLO_BOFD);//**
 									// don't remove this line
-									writeLog("CLO_BOFD:" + CLO_BOFD);
+									System.out.print("CLO_BOFD:" + CLO_BOFD);
 									String CLO_CHQNO = readLine
 											.substring(9, 15);
 									System.out.println("\nCLO_CHQNO:" + CLO_CHQNO);
 									String CLO_SORTCD = readLine.substring(15,
 											24);
-									writeLog("CLO_SORTCD:"+ CLO_SORTCD);
+									System.out.print("CLO_SORTCD:"+ CLO_SORTCD);
 									System.out.print("\n11111111111111111111111111111111111111111111111");
 									
 									String CLO_BRANCH_CD=branchFolder;//getBranchCode(CLO_BOFD);
@@ -1527,7 +1537,13 @@ BufferedReader br = new BufferedReader(
 										//System.out.print("readLine.substring(124,125).trim()=="+readLine.substring(124,125).trim());
 										clyNo=readLine.substring(124,125).trim();
 									}
-									System.out.print("clyNo="+clyNo);
+									
+									System.out.print("**********clyNo=**********"+clyNo);
+									if (readLine.length() >= 126) {
+									    clo_kiosk_flg = readLine.substring(125, 126).trim();
+
+									}
+									System.out.print("**********CLO_KIOSK_FLG  : *****************" + clo_kiosk_flg);
 									
 									String itemSeqNo="";
 									if(getConfValByNm("CFG_CBS_VENDOR",con).equalsIgnoreCase("LIST"))
@@ -1603,7 +1619,9 @@ BufferedReader br = new BufferedReader(
 									ps.setString(13, CLO_DRAWEE_ACCNO);
 									ps.setString(14, itemSeqNo);
 									ps.setString(15, clyNo);
-									
+									ps.setString(16, clo_kiosk_flg);
+									System.out.println("Inserted CLO_CYCLNO    : " + clyNo);
+									System.out.println("Inserted CLO_KIOSK_FLG : " + clo_kiosk_flg);
 									try 
 									{
 										validationPs.setString(1, CLO_BOFD);

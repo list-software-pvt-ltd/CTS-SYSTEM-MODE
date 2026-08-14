@@ -66,7 +66,7 @@
 									Type:</td>
 								<td width="15%" colspan="2" align="left"><select
 									id="clearingtype" name="clearingtype">
-										<option value="0">Select Clearing Type</option>
+										<option value="0">Select Clearing Type:</option>
 										<option value="01">CTS</option>
 										<option value="11">Non CTS</option>
 								</select></td>
